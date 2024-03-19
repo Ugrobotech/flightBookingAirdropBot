@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as TelegramBot from 'node-telegram-bot-api';
 
-const TELEGRAM_TOKEN = '';
+const TELEGRAM_TOKEN = 'Tokenges here';
 
 @Injectable()
 export class BotService {
@@ -94,6 +94,7 @@ export class BotService {
       switch (command) {
         case '/english':
           // save the language preference
+          this.bot.onReplyToMessage;
           this.bot.sendMessage(query.message.chat.id, '');
           console.log('here');
         default:
