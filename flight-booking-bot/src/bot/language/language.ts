@@ -1,0 +1,2 @@
+// english
+export const english = {};

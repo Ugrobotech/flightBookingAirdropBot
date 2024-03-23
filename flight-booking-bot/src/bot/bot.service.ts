@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as TelegramBot from 'node-telegram-bot-api';
+import { Countries_en } from './language/english/country';
 
-const TELEGRAM_TOKEN = 'Tokenges here';
+const TELEGRAM_TOKEN = '';
 
 @Injectable()
 export class BotService {
@@ -48,6 +49,7 @@ export class BotService {
 
     const selectLanguageMarkup = {
       inline_keyboard: selectLanguageKeyboard,
+      force_reply: true,
     };
 
     // parse incoming message and handle commands
@@ -66,13 +68,15 @@ export class BotService {
         console.log('Command :', command);
         if (command === '/start') {
           // send select language menu
-          await this.bot.sendMessage(
+          const langauagePrompt = await this.bot.sendMessage(
             msg.chat.id,
             `Please select language.\nПожалуйста, выберите язык.\nБудь ласка, виберіть мову.\nPor favor selecionar o idioma.\nSi prega di selezionare la lingua.\nLütfen dil seçin.\nकृपया एक भाषा चुनिए।`,
             {
               reply_markup: selectLanguageMarkup,
             },
           );
+          // keeping in context, to reply when a user selects a language
+          console.log(langauagePrompt);
         } else {
           // handle other commands
           // this.handleCommands(msg);
@@ -94,9 +98,10 @@ export class BotService {
       switch (command) {
         case '/english':
           // save the language preference
-          this.bot.onReplyToMessage;
-          this.bot.sendMessage(query.message.chat.id, '');
+
+          this.sendAllCountries(query.message.chat.id, 'english');
           console.log('here');
+          return;
         default:
           console.log('default');
       }
@@ -108,4 +113,52 @@ export class BotService {
       );
     }
   };
+
+  // send all country options
+  sendAllCountries = async (chat_id, language) => {
+    console.log(language);
+
+    try {
+      // using switch case to handle different language
+      switch (language) {
+        case 'english':
+          const selectCountry = Countries_en.secondDisplay;
+          // setup the keyboard markup
+
+          const selectCountryMarkup = {
+            inline_keyboard: selectCountry,
+          };
+
+          await this.bot.sendMessage(
+            chat_id,
+            `Please, Select your country 🌐`,
+            {
+              reply_markup: selectCountryMarkup,
+            },
+          );
+          return;
+        default:
+          await this.bot.sendMessage(
+            chat_id,
+            `Please, Select your country 🌐`,
+            {
+              reply_markup: selectCountryMarkup,
+            },
+          );
+          return;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 }
+
+// await this.bot.onReplyToMessage(
+//   msg.chat.id,
+//   langauagePrompt.message_id,
+//   async (selectedLanguage) => {
+//     // save the language to the user Db
+//     console.log(selectedLanguage);
+//     // const language = selectedLanguage.
+//   },
+// );
