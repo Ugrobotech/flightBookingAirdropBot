@@ -1,9 +1,9 @@
 // import translate from 'google-translate-api';
 // english
-export const Countries_en = {
+export const currencies = {
   firstDisplay: [
     [
-      { text: 'Australia', callback_data: '/australia' },
+      { text: 'Money', callback_data: '/australia' },
       { text: 'Austria', callback_data: '/austria' },
       { text: 'Bangladesh', callback_data: '/bangladesh' },
     ],
@@ -48,7 +48,7 @@ export const Countries_en = {
       {
         text: '>',
         callback_data: JSON.stringify({
-          command: '/nextcountrypage',
+          command: '/nextCurrencyPage',
           action: 'secondDisplay',
         }),
       },
@@ -56,7 +56,7 @@ export const Countries_en = {
   ],
   secondDisplay: [
     [
-      { text: 'Ekete', callback_data: '/australia' },
+      { text: 'ego', callback_data: '/australia' },
       { text: 'Austria', callback_data: '/austria' },
       { text: 'Bangladesh', callback_data: '/bangladesh' },
     ],
@@ -99,7 +99,7 @@ export const Countries_en = {
       {
         text: '<',
         callback_data: JSON.stringify({
-          command: '/prevcountrypage',
+          command: '/prevCurrencyPage',
           action: 'firstDisplay',
         }),
       },
@@ -107,7 +107,7 @@ export const Countries_en = {
       {
         text: '>',
         callback_data: JSON.stringify({
-          command: '/nextcountrypage',
+          command: '/nextCurrencyPage',
           action: 'thirdDisplay',
         }),
       },
@@ -158,7 +158,7 @@ export const Countries_en = {
       {
         text: '<',
         callback_data: JSON.stringify({
-          command: '/prev',
+          command: '/prevCurrencyPage',
           action: 'firstDisplay',
         }),
       },
@@ -166,7 +166,7 @@ export const Countries_en = {
       {
         text: '>',
         callback_data: JSON.stringify({
-          command: '/next',
+          command: '/nextCurrencyPage',
           action: 'thirdDisplay',
         }),
       },

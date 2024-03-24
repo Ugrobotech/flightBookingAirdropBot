@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { Countries_en } from './language/english/country';
+import { currencies } from './language/currency';
 
 const TELEGRAM_TOKEN = '';
 
@@ -128,7 +129,7 @@ export class BotService {
           this.sendAllCountries(query.message.chat.id, 'english');
           console.log('here');
           return;
-        case '/next':
+        case '/nextCountryPage':
           if (action) {
             console.log('action :', action);
             console.log('message id :', query.message.message_id);
@@ -142,9 +143,30 @@ export class BotService {
               'english',
               changeDisplay,
             );
+            return;
+          } else {
+            return;
+          }
+
+        case '/prevCountryPage':
+          if (action) {
+            console.log('action :', action);
+            console.log('message id :', query.message.message_id);
+            const changeDisplay = {
+              buttonPage: action,
+              messageId: query.message.message_id,
+            };
+
+            this.sendAllCountries(
+              query.message.chat.id,
+              'english',
+              changeDisplay,
+            );
+            return;
           }
           return;
-        case '/prev':
+
+        case '/nextCurrencyPage':
           if (action) {
             console.log('action :', action);
             console.log('message id :', query.message.message_id);
@@ -153,11 +175,30 @@ export class BotService {
               messageId: query.message.message_id,
             };
 
-            this.sendAllCountries(
+            this.sendCountryCurrency(
               query.message.chat.id,
               'english',
               changeDisplay,
             );
+            return;
+          }
+          return;
+
+        case '/prevCurrencyPage':
+          if (action) {
+            console.log('action :', action);
+            console.log('message id :', query.message.message_id);
+            const changeDisplay = {
+              buttonPage: action,
+              messageId: query.message.message_id,
+            };
+
+            this.sendCountryCurrency(
+              query.message.chat.id,
+              'english',
+              changeDisplay,
+            );
+            return;
           }
           return;
 
@@ -236,9 +277,51 @@ export class BotService {
     }
   };
 
-  sendCountryFlag = async (chat_id, language, changeDisplay?) => {
+  sendCountryCurrency = async (chat_id, language, changeDisplay?) => {
     let displayPage; // the flag display page to be displayed
     let messageId;
+    if (!changeDisplay) {
+      displayPage = 'firstDisplay';
+    } else {
+      displayPage = changeDisplay.buttonPage;
+      messageId = changeDisplay.messageId;
+    }
+
+    try {
+      switch (language) {
+        case 'english':
+          const selectCurrency = currencies[displayPage];
+
+          const selectCurrencyMarkup = {
+            inline_keyboard: selectCurrency,
+          };
+
+          if (!messageId) {
+            await this.bot.sendMessage(chat_id, 'Choose your currency 💱', {
+              reply_markup: selectCurrencyMarkup,
+            });
+            return;
+          } else {
+            await this.bot.editMessageReplyMarkup(selectCurrencyMarkup, {
+              chat_id,
+              message_id: messageId,
+            });
+            return;
+          }
+
+        default:
+          const defaultCurrency = currencies.firstDisplay;
+          const defaultCurrencyMarkup = {
+            inline_keyboard: defaultCurrency,
+          };
+          await this.bot.sendMessage(chat_id, 'Choose your currency 💱', {
+            reply_markup: defaultCurrencyMarkup,
+          });
+          return;
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 }
 
