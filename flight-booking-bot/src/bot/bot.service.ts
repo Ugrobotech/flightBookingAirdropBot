@@ -93,7 +93,33 @@ export class BotService {
 
   // handlebuttoncommands
   handleButtonCommand = async (query: any) => {
-    const command = query.data.toLowerCase();
+    let command: string;
+    let action: string;
+
+    // function to check if query.data is a json type
+    function isJSON(str) {
+      try {
+        JSON.parse(str);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    if (isJSON(query.data)) {
+      command = JSON.parse(query.data).command;
+      action = JSON.parse(query.data).action;
+    } else {
+      command = query.data;
+    }
+
+    // console.log(query.message.chat.id);
+    const chatId = query.message.chat.id;
+
+    const userId = query.from.id;
+    console.log(command);
+
+    console.log(userId, chatId);
     try {
       switch (command) {
         case '/english':
@@ -102,6 +128,39 @@ export class BotService {
           this.sendAllCountries(query.message.chat.id, 'english');
           console.log('here');
           return;
+        case '/next':
+          if (action) {
+            console.log('action :', action);
+            console.log('message id :', query.message.message_id);
+            const changeDisplay = {
+              buttonPage: action,
+              messageId: query.message.message_id,
+            };
+
+            this.sendAllCountries(
+              query.message.chat.id,
+              'english',
+              changeDisplay,
+            );
+          }
+          return;
+        case '/prev':
+          if (action) {
+            console.log('action :', action);
+            console.log('message id :', query.message.message_id);
+            const changeDisplay = {
+              buttonPage: action,
+              messageId: query.message.message_id,
+            };
+
+            this.sendAllCountries(
+              query.message.chat.id,
+              'english',
+              changeDisplay,
+            );
+          }
+          return;
+
         default:
           console.log('default');
       }
@@ -115,34 +174,59 @@ export class BotService {
   };
 
   // send all country options
-  sendAllCountries = async (chat_id, language) => {
+  sendAllCountries = async (chat_id, language, changeDisplay?) => {
     console.log(language);
-
+    let display; // the particular button page to be displayed
+    let messageId;
+    if (!changeDisplay) {
+      display = 'firstDisplay';
+    } else {
+      display = changeDisplay.buttonPage;
+      messageId = changeDisplay.messageId;
+      console.log('displayaction :', display);
+    }
     try {
       // using switch case to handle different language
       switch (language) {
         case 'english':
-          const selectCountry = Countries_en.secondDisplay;
+          const selectCountry = Countries_en[display];
           // setup the keyboard markup
 
           const selectCountryMarkup = {
             inline_keyboard: selectCountry,
           };
 
-          await this.bot.sendMessage(
-            chat_id,
-            `Please, Select your country 🌐`,
-            {
-              reply_markup: selectCountryMarkup,
-            },
-          );
-          return;
+          if (!messageId) {
+            console.log('ebea');
+            await this.bot.sendMessage(
+              chat_id,
+              `Please, Select your country 🌐`,
+              {
+                reply_markup: selectCountryMarkup,
+              },
+            );
+            return;
+          } else {
+            console.log('message needs to be edited');
+            await this.bot.editMessageReplyMarkup(selectCountryMarkup, {
+              chat_id,
+              message_id: messageId,
+            });
+            return;
+          }
+
         default:
+          const defaultCountry = Countries_en.firstDisplay;
+          // setup the keyboard markup
+
+          const defaultCountryMarkup = {
+            inline_keyboard: defaultCountry,
+          };
           await this.bot.sendMessage(
             chat_id,
             `Please, Select your country 🌐`,
             {
-              reply_markup: selectCountryMarkup,
+              reply_markup: defaultCountryMarkup,
             },
           );
           return;
@@ -150,6 +234,11 @@ export class BotService {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  sendCountryFlag = async (chat_id, language, changeDisplay?) => {
+    let displayPage; // the flag display page to be displayed
+    let messageId;
   };
 }
 
