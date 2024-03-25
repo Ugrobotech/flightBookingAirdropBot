@@ -3,6 +3,8 @@ import * as TelegramBot from 'node-telegram-bot-api';
 import { Countries_en } from './language/english/country';
 import { currencies } from './language/currency';
 import { welcomeMessageMarkup_en } from './language/english/welcome';
+import { searchType } from './language/english/search';
+import { premiumDeal } from './language/english/premiumDeal';
 
 const TELEGRAM_TOKEN = '';
 
@@ -97,6 +99,19 @@ export class BotService {
             );
           } else if (state && !state.country) {
             await this.sendAllCountries(msg.chat.id, state.language);
+          } else {
+            switch (command) {
+              default:
+                const welcomeMessage = welcomeMessageMarkup_en.welcome;
+                const welcomeMessageMarkup = {
+                  inline_keyboard: welcomeMessage,
+                };
+                await this.bot.sendMessage(
+                  msg.chat.id,
+                  `Alright, please choose what we will do 👇`,
+                  { reply_markup: welcomeMessageMarkup },
+                );
+            }
           }
           // handle other commands
           // this.handleCommands(msg);
@@ -121,6 +136,7 @@ export class BotService {
     const last_name = query.from.last_name;
     const user_Id = query.from.id;
     const username = `${first_name} ${last_name}`;
+    let searchLanguage: string;
 
     // function to check if query.data is a json type
     function isJSON(str) {
@@ -142,6 +158,7 @@ export class BotService {
       action = JSON.parse(query.data).action;
       country = JSON.parse(query.data).country;
       currency = JSON.parse(query.data).currency;
+      searchLanguage = JSON.parse(query.data).language;
     } else {
       command = query.data;
     }
@@ -212,14 +229,19 @@ export class BotService {
           if (action) {
             console.log('action :', action);
             console.log('message id :', query.message.message_id);
+
+            const [btnPage, language] = splitword(action);
+            console.log('action :', action);
+            console.log('message id :', query.message.message_id);
+
             const changeDisplay = {
-              buttonPage: action,
+              buttonPage: btnPage,
               messageId: query.message.message_id,
             };
 
             this.sendAllCountries(
               query.message.chat.id,
-              'english',
+              language,
               changeDisplay,
             );
             return;
@@ -259,6 +281,22 @@ export class BotService {
               changeDisplay,
             );
             return;
+          }
+          return;
+        case '/newSearch':
+          if (searchLanguage) {
+            return await this.searchFlightLayout(
+              query.message.chat.id,
+              searchLanguage,
+            );
+          }
+          return;
+        case '/premiumDeals':
+          if (searchLanguage) {
+            return await this.sendPremiumDealLayout(
+              query.message.chat.id,
+              searchLanguage,
+            );
           }
           return;
 
@@ -397,6 +435,46 @@ export class BotService {
             { reply_markup: welcomeMessageMarkup },
           );
           return;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  searchFlightLayout = async (chatId, language) => {
+    try {
+      switch (language) {
+        case 'english':
+          const searchFlight = searchType.searchTypeMarkup;
+
+          const selectFlightMarkup = {
+            inline_keyboard: searchFlight,
+          };
+          return await this.bot.sendMessage(
+            chatId,
+            `Please select the type of search 👇`,
+            { reply_markup: selectFlightMarkup },
+          );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  sendPremiumDealLayout = async (chatId, language) => {
+    try {
+      switch (language) {
+        case 'english':
+          const premiumDeals = premiumDeal.premiumDealMarkup;
+
+          const premiumMarkup = {
+            inline_keyboard: premiumDeals,
+          };
+          return await this.bot.sendMessage(
+            chatId,
+            `Upgrade to Flight-booking Premium and enjoy access to all the benefits at an incredibly affordable price.\n\nToday Only: 90% OFF! $120 $12/year\n\n🛩 Choose a specific flight to track.\n\n⚡️ Enjoy more frequent updates on ticket prices.\n\n🤘 Be the first to receive flight alerts.\n\n🎫 Use the Flight Deals feature to find flights across a wide range of dates and track prices for all flights at once.\n\n💬 Receive premium support.\n\n💸 Support an independent business that respects your data privacy.\n\n💳 30-day money-back guarantee if you're not satisfied.`,
+            { reply_markup: premiumMarkup },
+          );
       }
     } catch (error) {
       console.log(error);
