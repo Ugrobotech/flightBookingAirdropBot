@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { Countries_en } from './language/english/country';
 import { currencies } from './language/currency';
+import { welcomeMessageMarkup_en } from './language/english/welcome';
 
 const TELEGRAM_TOKEN = '';
 
@@ -115,8 +116,11 @@ export class BotService {
     let command: string;
     let action: string;
     let country: string;
-    let language: string;
     let currency: string;
+    const first_name = query.from.first_name;
+    const last_name = query.from.last_name;
+    const user_Id = query.from.id;
+    const username = `${first_name} ${last_name}`;
 
     // function to check if query.data is a json type
     function isJSON(str) {
@@ -128,11 +132,15 @@ export class BotService {
       }
     }
 
+    // function to split country from language
+    function splitword(word) {
+      return word.split('_');
+    }
+
     if (isJSON(query.data)) {
       command = JSON.parse(query.data).command;
       action = JSON.parse(query.data).action;
       country = JSON.parse(query.data).country;
-      language = JSON.parse(query.data).language;
       currency = JSON.parse(query.data).currency;
     } else {
       command = query.data;
@@ -159,7 +167,8 @@ export class BotService {
 
         case '/countrySelected':
           if (country) {
-            console.log('selected country :', country);
+            const [countryName, language] = splitword(country);
+            console.log('selected country :', countryName);
             // save users country
             delete this.userStates[chatId];
             await this.sendCountryCurrency(chatId, language);
@@ -170,26 +179,28 @@ export class BotService {
 
         case '/currencySelected':
           if (currency) {
-            console.log('selected currency :', currency);
-            // save users country
-            await this.bot.sendMessage(chatId, 'WELLCOME FAM');
-            return;
+            const [countryCurrency, language] = splitword(currency);
+            console.log('selected currency :', countryCurrency);
+            // save users country currency
+            await this.welcomeMessage(chatId, language, username);
           }
 
           return;
 
         case '/nextCountryPage':
           if (action) {
+            const [btnPage, language] = splitword(action);
             console.log('action :', action);
             console.log('message id :', query.message.message_id);
+
             const changeDisplay = {
-              buttonPage: action,
+              buttonPage: btnPage,
               messageId: query.message.message_id,
             };
 
             this.sendAllCountries(
               query.message.chat.id,
-              'english',
+              language,
               changeDisplay,
             );
             return;
@@ -367,6 +378,24 @@ export class BotService {
           await this.bot.sendMessage(chat_id, 'Choose your currency 💱', {
             reply_markup: defaultCurrencyMarkup,
           });
+          return;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  welcomeMessage = async (chat_id, language, userName) => {
+    try {
+      switch (language) {
+        case 'english':
+          const welcomeMessage = welcomeMessageMarkup_en.welcome;
+          const welcomeMessageMarkup = { inline_keyboard: welcomeMessage };
+          await this.bot.sendMessage(
+            chat_id,
+            `Hi ${userName}! 👋 Welcome to FlightBookin bot. Here is what I can do:\n\n– Search for cheapest flights 🔎\n– Track tickets prices 👀\n– Notify about price changes 🔔\n\nShall we start? 👇`,
+            { reply_markup: welcomeMessageMarkup },
+          );
           return;
       }
     } catch (error) {

@@ -7,7 +7,7 @@ export const currencies = {
         text: 'Money',
         callback_data: JSON.stringify({
           command: '/currencySelected',
-          currency: 'NGN',
+          currency: 'NGN_english',
         }),
       },
       { text: 'Austria', callback_data: '/austria' },

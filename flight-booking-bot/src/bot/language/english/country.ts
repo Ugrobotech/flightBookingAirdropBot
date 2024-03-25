@@ -7,7 +7,7 @@ export const Countries_en = {
         text: 'Australia',
         callback_data: JSON.stringify({
           command: '/countrySelected',
-          country: 'Australia',
+          country: 'Australia_english',
         }),
       },
       {
@@ -67,7 +67,7 @@ export const Countries_en = {
         text: '>',
         callback_data: JSON.stringify({
           command: '/nextCountryPage',
-          action: 'secondDisplay',
+          action: 'secondDisplay_english',
         }),
       },
     ],
@@ -118,7 +118,7 @@ export const Countries_en = {
         text: '<',
         callback_data: JSON.stringify({
           command: '/prevCountryPage',
-          action: 'firstDisplay',
+          action: 'firstDisplay_english',
         }),
       },
       { text: 'United States', callback_data: '/us' },
@@ -126,7 +126,7 @@ export const Countries_en = {
         text: '>',
         callback_data: JSON.stringify({
           command: '/nextCountryPage',
-          action: 'thirdDisplay',
+          action: 'thirdDisplay_english',
         }),
       },
     ],
@@ -177,7 +177,7 @@ export const Countries_en = {
         text: '<',
         callback_data: JSON.stringify({
           command: '/prevCountryPage',
-          action: 'secondDisplay',
+          action: 'secondDisplay_english',
         }),
       },
       { text: 'United States', callback_data: '/us' },
@@ -185,7 +185,7 @@ export const Countries_en = {
         text: '>',
         callback_data: JSON.stringify({
           command: '/nextCountryPage',
-          action: 'thirdDisplay',
+          action: 'thirdDisplay_english',
         }),
       },
     ],
