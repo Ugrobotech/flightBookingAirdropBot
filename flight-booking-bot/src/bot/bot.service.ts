@@ -300,6 +300,15 @@ export class BotService {
           }
           return;
 
+        case '/menu':
+          if (searchLanguage) {
+            return await this.defaultMenuLyout(
+              query.message.chat.id,
+              searchLanguage,
+            );
+          }
+          return;
+
         default:
           console.log('default');
       }
@@ -432,6 +441,24 @@ export class BotService {
           await this.bot.sendMessage(
             chat_id,
             `Hi ${userName}! 👋 Welcome to FlightBookin bot. Here is what I can do:\n\n– Search for cheapest flights 🔎\n– Track tickets prices 👀\n– Notify about price changes 🔔\n\nShall we start? 👇`,
+            { reply_markup: welcomeMessageMarkup },
+          );
+          return;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  defaultMenuLyout = async (chat_id, language) => {
+    try {
+      switch (language) {
+        case 'english':
+          const welcomeMessage = welcomeMessageMarkup_en.welcome;
+          const welcomeMessageMarkup = { inline_keyboard: welcomeMessage };
+          await this.bot.sendMessage(
+            chat_id,
+            `Alright, please choose what we will do 👇`,
             { reply_markup: welcomeMessageMarkup },
           );
           return;
