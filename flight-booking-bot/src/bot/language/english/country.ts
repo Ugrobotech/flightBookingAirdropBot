@@ -3,9 +3,27 @@
 export const Countries_en = {
   firstDisplay: [
     [
-      { text: 'Australia', callback_data: '/australia' },
-      { text: 'Austria', callback_data: '/austria' },
-      { text: 'Bangladesh', callback_data: '/bangladesh' },
+      {
+        text: 'Australia',
+        callback_data: JSON.stringify({
+          command: '/countrySelected',
+          country: 'Australia',
+        }),
+      },
+      {
+        text: 'Austria',
+        callback_data: JSON.stringify({
+          command: '/countrySelected',
+          country: 'Australia',
+        }),
+      },
+      {
+        text: 'Bangladesh',
+        callback_data: JSON.stringify({
+          command: '/countrySelected',
+          country: 'Australia',
+        }),
+      },
     ],
     [
       { text: 'Brazil', callback_data: '/brazil' },
@@ -48,7 +66,7 @@ export const Countries_en = {
       {
         text: '>',
         callback_data: JSON.stringify({
-          command: '/nextcountrypage',
+          command: '/nextCountryPage',
           action: 'secondDisplay',
         }),
       },
@@ -99,7 +117,7 @@ export const Countries_en = {
       {
         text: '<',
         callback_data: JSON.stringify({
-          command: '/prevcountrypage',
+          command: '/prevCountryPage',
           action: 'firstDisplay',
         }),
       },
@@ -107,7 +125,7 @@ export const Countries_en = {
       {
         text: '>',
         callback_data: JSON.stringify({
-          command: '/nextcountrypage',
+          command: '/nextCountryPage',
           action: 'thirdDisplay',
         }),
       },
@@ -158,15 +176,15 @@ export const Countries_en = {
       {
         text: '<',
         callback_data: JSON.stringify({
-          command: '/prev',
-          action: 'firstDisplay',
+          command: '/prevCountryPage',
+          action: 'secondDisplay',
         }),
       },
       { text: 'United States', callback_data: '/us' },
       {
         text: '>',
         callback_data: JSON.stringify({
-          command: '/next',
+          command: '/nextCountryPage',
           action: 'thirdDisplay',
         }),
       },

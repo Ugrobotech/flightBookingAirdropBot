@@ -9,6 +9,7 @@ const TELEGRAM_TOKEN = '';
 export class BotService {
   private readonly bot: TelegramBot;
   private logger = new Logger(BotService.name);
+  private userStates = {}; // to monitor a usersState(will be moved to the db later)
 
   constructor() {
     //initializing thr Telegram bot
@@ -55,8 +56,9 @@ export class BotService {
 
     // parse incoming message and handle commands
     try {
+      const state = this.userStates[msg.chat.id];
       // check for messages that are not text
-      if (!msg.text) {
+      if (!msg.text && !state) {
         this.bot.sendMessage(
           msg.chat.id,
           'Please select the type of search 👇',
@@ -68,6 +70,11 @@ export class BotService {
         const command = msg.text.toLowerCase();
         console.log('Command :', command);
         if (command === '/start') {
+          // create a state for the user
+          this.userStates[msg.chat.id] = {
+            language: undefined,
+            country: undefined,
+          };
           // send select language menu
           const langauagePrompt = await this.bot.sendMessage(
             msg.chat.id,
@@ -79,6 +86,17 @@ export class BotService {
           // keeping in context, to reply when a user selects a language
           console.log(langauagePrompt);
         } else {
+          if (state && !state.language) {
+            await this.bot.sendMessage(
+              msg.chat.id,
+              `Please select language.\nПожалуйста, выберите язык.\nБудь ласка, виберіть мову.\nPor favor selecionar o idioma.\nSi prega di selezionare la lingua.\nLütfen dil seçin.\nकृपया एक भाषा चुनिए।`,
+              {
+                reply_markup: selectLanguageMarkup,
+              },
+            );
+          } else if (state && !state.country) {
+            await this.sendAllCountries(msg.chat.id, state.language);
+          }
           // handle other commands
           // this.handleCommands(msg);
         }
@@ -96,6 +114,9 @@ export class BotService {
   handleButtonCommand = async (query: any) => {
     let command: string;
     let action: string;
+    let country: string;
+    let language: string;
+    let currency: string;
 
     // function to check if query.data is a json type
     function isJSON(str) {
@@ -110,6 +131,9 @@ export class BotService {
     if (isJSON(query.data)) {
       command = JSON.parse(query.data).command;
       action = JSON.parse(query.data).action;
+      country = JSON.parse(query.data).country;
+      language = JSON.parse(query.data).language;
+      currency = JSON.parse(query.data).currency;
     } else {
       command = query.data;
     }
@@ -125,10 +149,35 @@ export class BotService {
       switch (command) {
         case '/english':
           // save the language preference
-
+          this.userStates[chatId] = {
+            language: 'english',
+            country: undefined,
+          };
           this.sendAllCountries(query.message.chat.id, 'english');
           console.log('here');
           return;
+
+        case '/countrySelected':
+          if (country) {
+            console.log('selected country :', country);
+            // save users country
+            delete this.userStates[chatId];
+            await this.sendCountryCurrency(chatId, language);
+            return;
+          }
+
+          return;
+
+        case '/currencySelected':
+          if (currency) {
+            console.log('selected currency :', currency);
+            // save users country
+            await this.bot.sendMessage(chatId, 'WELLCOME FAM');
+            return;
+          }
+
+          return;
+
         case '/nextCountryPage':
           if (action) {
             console.log('action :', action);
@@ -246,6 +295,7 @@ export class BotService {
                 reply_markup: selectCountryMarkup,
               },
             );
+
             return;
           } else {
             console.log('message needs to be edited');

@@ -3,7 +3,13 @@
 export const currencies = {
   firstDisplay: [
     [
-      { text: 'Money', callback_data: '/australia' },
+      {
+        text: 'Money',
+        callback_data: JSON.stringify({
+          command: '/currencySelected',
+          currency: 'NGN',
+        }),
+      },
       { text: 'Austria', callback_data: '/austria' },
       { text: 'Bangladesh', callback_data: '/bangladesh' },
     ],
