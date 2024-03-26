@@ -27,8 +27,19 @@ export const welcomeMessageMarkup_en = {
       },
     ],
     [
-      { text: '⚙️ Settings', callback_data: '/settings' },
-      { text: '📢 Share', callback_data: '/share' },
+      {
+        text: '⚙️ Settings',
+        callback_data: JSON.stringify({
+          command: '/settings',
+          language: 'english',
+        }),
+      },
+      {
+        text: '📢 Share',
+        language: 'english',
+        switch_inline_query:
+          'is a bot designed for searching cheap flights 🛩 and tracking the ticket prices.',
+      },
     ],
   ],
 };

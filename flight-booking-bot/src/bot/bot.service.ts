@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { Countries_en } from './language/english/country';
-import { currencies } from './language/currency';
-import { welcomeMessageMarkup_en } from './language/english/welcome';
-import { searchType } from './language/english/search';
-import { premiumDeal } from './language/english/premiumDeal';
+import { Countries_en } from './keyboardMarkups/country';
+import { currencies } from './keyboardMarkups/currency';
+import { welcomeMessageMarkup_en } from './keyboardMarkups/welcome';
+import { searchType } from './keyboardMarkups/search';
+import { premiumDeal } from './keyboardMarkups/premiumDeal';
+import { selectLanguage } from './keyboardMarkups/selectLanguage';
 import { ConfigService } from '@nestjs/config';
 
 // const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
@@ -31,33 +32,10 @@ export class BotService {
   // Event handler for incoming message
   onReceiveMessage = async (msg: any) => {
     this.logger.debug(msg); // log the message
-    const searchTypeKeyboard = [
-      [
-        { text: '➡️ One way', callback_data: '/oneway' },
-        { text: '⬅️➡️ Return', callback_data: '/return' },
-      ],
-      [{ text: '🔄 Multi-city', callback_data: '/multycity' }],
-    ];
-
-    const selectLanguageKeyboard = [
-      [{ text: 'English', callback_data: '/english' }],
-      [{ text: 'Español', callback_data: '/spanish' }],
-      [{ text: 'Русский', callback_data: '/russian' }],
-      [{ text: 'Українська', callback_data: '/ukrainian' }],
-      [{ text: 'Português (Brasil)', callback_data: '/esp' }],
-      [{ text: 'Italian', callback_data: '/portuguese' }],
-      [{ text: 'Türkçe', callback_data: '/turkish' }],
-      [{ text: 'हिंदी', callback_data: '/hindi' }],
-    ];
 
     // setup the keyboard markup
     const searchReplyMarkup = {
-      inline_keyboard: searchTypeKeyboard,
-    };
-
-    const selectLanguageMarkup = {
-      inline_keyboard: selectLanguageKeyboard,
-      force_reply: true,
+      inline_keyboard: searchType.searchTypeMarkup,
     };
 
     // parse incoming message and handle commands
@@ -82,24 +60,11 @@ export class BotService {
             country: undefined,
           };
           // send select language menu
-          const langauagePrompt = await this.bot.sendMessage(
-            msg.chat.id,
-            `Please select language.\nПожалуйста, выберите язык.\nБудь ласка, виберіть мову.\nPor favor selecionar o idioma.\nSi prega di selezionare la lingua.\nLütfen dil seçin.\nकृपया एक भाषा चुनिए।`,
-            {
-              reply_markup: selectLanguageMarkup,
-            },
-          );
+          return await this.selectLanguageLayout(msg.chat.id);
           // keeping in context, to reply when a user selects a language
-          console.log(langauagePrompt);
         } else {
           if (state && !state.language) {
-            await this.bot.sendMessage(
-              msg.chat.id,
-              `Please select language.\nПожалуйста, выберите язык.\nБудь ласка, виберіть мову.\nPor favor selecionar o idioma.\nSi prega di selezionare la lingua.\nLütfen dil seçin.\nकृपया एक भाषा चुनिए।`,
-              {
-                reply_markup: selectLanguageMarkup,
-              },
-            );
+            return this.selectLanguageLayout(msg.chat.id);
           } else if (state && !state.country) {
             await this.sendAllCountries(msg.chat.id, state.language);
           } else {
@@ -137,7 +102,7 @@ export class BotService {
     let currency: string;
     const first_name = query.from.first_name;
     const last_name = query.from.last_name;
-    const user_Id = query.from.id;
+    // const user_Id = query.from.id;
     const username = `${first_name} ${last_name}`;
     let searchLanguage: string;
 
@@ -312,6 +277,19 @@ export class BotService {
           }
           return;
 
+        case '/settings':
+          // this.userStates[query.message.chat.id];
+          this.userStates[query.message.chat.id] = {
+            language: undefined,
+            country: undefined,
+          };
+          return this.selectLanguageLayout(query.message.chat.id);
+
+          return await this.defaultMenuLyout(
+            query.message.chat.id,
+            searchLanguage,
+          );
+
         default:
           console.log('default');
       }
@@ -324,6 +302,23 @@ export class BotService {
     }
   };
 
+  selectLanguageLayout = async (chat_id) => {
+    const selectLanguageMarkup = {
+      inline_keyboard: selectLanguage.selectLanguageKeyboard,
+      force_reply: true,
+    };
+    try {
+      await this.bot.sendMessage(
+        chat_id,
+        `Please select language.\nПожалуйста, выберите язык.\nБудь ласка, виберіть мову.\nPor favor selecionar o idioma.\nSi prega di selezionare la lingua.\nLütfen dil seçin.\nकृपया एक भाषा चुनिए।`,
+        {
+          reply_markup: selectLanguageMarkup,
+        },
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
   // send all country options
   sendAllCountries = async (chat_id, language, changeDisplay?) => {
     console.log(language);

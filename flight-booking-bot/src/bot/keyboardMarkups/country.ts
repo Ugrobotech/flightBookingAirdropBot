@@ -74,14 +74,14 @@ export const Countries_en = {
   ],
   secondDisplay: [
     [
-      { text: 'Ekete', callback_data: '/australia' },
-      { text: 'Austria', callback_data: '/austria' },
-      { text: 'Bangladesh', callback_data: '/bangladesh' },
+      { text: 'Algeria', callback_data: '/Algeria' },
+      { text: 'Argentina', callback_data: '/Argentina' },
+      { text: 'Bahrain', callback_data: '/Bahrain' },
     ],
     [
-      { text: 'Brazil', callback_data: '/brazil' },
-      { text: 'Canada', callback_data: '/canada' },
-      { text: 'Czech Republic', callback_data: '/czech_republic' },
+      { text: 'Belgium', callback_data: '/Belgium' },
+      { text: 'Chile', callback_data: '/Chile' },
+      { text: 'Colombia', callback_data: '/Colombia' },
     ],
     [
       { text: 'Denmark', callback_data: '/denmark' },
