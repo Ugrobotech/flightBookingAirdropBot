@@ -5,8 +5,9 @@ import { currencies } from './language/currency';
 import { welcomeMessageMarkup_en } from './language/english/welcome';
 import { searchType } from './language/english/search';
 import { premiumDeal } from './language/english/premiumDeal';
+import { ConfigService } from '@nestjs/config';
 
-const TELEGRAM_TOKEN = '';
+// const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 
 @Injectable()
 export class BotService {
@@ -14,9 +15,11 @@ export class BotService {
   private logger = new Logger(BotService.name);
   private userStates = {}; // to monitor a usersState(will be moved to the db later)
 
-  constructor() {
+  constructor(private config: ConfigService) {
     //initializing thr Telegram bot
-    this.bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
+    this.bot = new TelegramBot(this.config.get('TELEGRAM_TOKEN'), {
+      polling: true,
+    });
 
     // Register event listerner for incoming messages
     this.bot.on('message', this.onReceiveMessage);
