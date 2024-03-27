@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { Countries_en } from './keyboardMarkups/country';
-import { currencies } from './keyboardMarkups/currency';
+import { currencies_en } from './keyboardMarkups/currency';
 import { welcomeMessageMarkup_en } from './keyboardMarkups/welcome';
 import { searchType } from './keyboardMarkups/search';
 import { premiumDeal } from './keyboardMarkups/premiumDeal';
@@ -396,7 +396,7 @@ export class BotService {
     try {
       switch (language) {
         case 'english':
-          const selectCurrency = currencies[displayPage];
+          const selectCurrency = currencies_en[displayPage];
 
           const selectCurrencyMarkup = {
             inline_keyboard: selectCurrency,
@@ -416,7 +416,7 @@ export class BotService {
           }
 
         default:
-          const defaultCurrency = currencies.firstDisplay;
+          const defaultCurrency = currencies_en.firstDisplay;
           const defaultCurrencyMarkup = {
             inline_keyboard: defaultCurrency,
           };

@@ -1,16 +1,16 @@
 // import translate from 'google-translate-api';
 // english
-export const currencies = {
+export const currencies_en = {
   firstDisplay: [
     [
       {
-        text: 'Money',
+        text: '🇪🇺 EUR',
         callback_data: JSON.stringify({
           command: '/currencySelected',
-          currency: 'NGN_english',
+          currency: 'EUR_english',
         }),
       },
-      { text: 'Austria', callback_data: '/austria' },
+      { text: '🇺🇸 USA', callback_data: '/austria' },
       { text: 'Bangladesh', callback_data: '/bangladesh' },
     ],
     [
