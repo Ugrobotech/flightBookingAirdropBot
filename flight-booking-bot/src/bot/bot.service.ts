@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as TelegramBot from 'node-telegram-bot-api';
-import { Countries_en } from './keyboardMarkups/country';
-import { currencies_en } from './keyboardMarkups/currency';
-import { welcomeMessageMarkup_en } from './keyboardMarkups/welcome';
-import { searchType } from './keyboardMarkups/search';
-import { premiumDeal } from './keyboardMarkups/premiumDeal';
+import { Countries_en } from './keyboardMarkups/english/country';
+import { Countries_esp } from './keyboardMarkups/spanish/country';
+import { currencies_en } from './keyboardMarkups/english/currency';
+import { welcomeMessageMarkup_en } from './keyboardMarkups/english/welcome';
+import { searchType } from './keyboardMarkups/english/search';
+import { premiumDeal } from './keyboardMarkups/english/premiumDeal';
 import { selectLanguage } from './keyboardMarkups/selectLanguage';
 import { ConfigService } from '@nestjs/config';
 
@@ -147,6 +148,16 @@ export class BotService {
             country: undefined,
           };
           this.sendAllCountries(query.message.chat.id, 'english');
+          console.log('here');
+          return;
+
+        case '/spanish':
+          // save the language preference
+          this.userStates[chatId] = {
+            language: 'spanish',
+            country: undefined,
+          };
+          this.sendAllCountries(query.message.chat.id, 'spanish');
           console.log('here');
           return;
 
@@ -332,13 +343,15 @@ export class BotService {
       console.log('displayaction :', display);
     }
     try {
+      let selectCountry;
+      let selectCountryMarkup;
       // using switch case to handle different language
       switch (language) {
         case 'english':
-          const selectCountry = Countries_en[display];
+          selectCountry = Countries_en[display];
           // setup the keyboard markup
 
-          const selectCountryMarkup = {
+          selectCountryMarkup = {
             inline_keyboard: selectCountry,
           };
 
@@ -347,6 +360,33 @@ export class BotService {
             await this.bot.sendMessage(
               chat_id,
               `Please, Select your country 🌐`,
+              {
+                reply_markup: selectCountryMarkup,
+              },
+            );
+
+            return;
+          } else {
+            console.log('message needs to be edited');
+            await this.bot.editMessageReplyMarkup(selectCountryMarkup, {
+              chat_id,
+              message_id: messageId,
+            });
+            return;
+          }
+        case 'spanish':
+          selectCountry = Countries_esp[display];
+          // setup the keyboard markup
+
+          selectCountryMarkup = {
+            inline_keyboard: selectCountry,
+          };
+
+          if (!messageId) {
+            console.log('ebea');
+            await this.bot.sendMessage(
+              chat_id,
+              `Por favor selecciona tu país 🌐`,
               {
                 reply_markup: selectCountryMarkup,
               },
